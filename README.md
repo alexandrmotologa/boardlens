@@ -1,17 +1,28 @@
-# BoardLens
+<p align="center">
+  <img src="docs/images/logo.png?raw=true" alt="BoardLens Logo" width="130" style="border-radius: 24px;" />
+</p>
 
-Virtual microcontroller and hardware logic simulator for embedded systems engineers.
+<h1 align="center">BoardLens</h1>
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen.svg)](#testing)
+<p align="center">
+  Virtual microcontroller and hardware logic simulator for embedded systems engineers.
+</p>
 
-![BoardLens Demo](docs/images/boardlens_demo.gif)
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
+  <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.10+-blue.svg" alt="Python 3.10+"></a>
+  <a href="#testing"><img src="https://img.shields.io/badge/coverage-81%25-brightgreen.svg" alt="Coverage: 81%"></a>
+</p>
 
-| Real-Time Execution | Peripheral Traces |
+<p align="center">
+  <img src="docs/images/boardlens_demo.gif" alt="BoardLens Live Demo" />
+</p>
+
+| Real-Time Execution | Code Editor & Hot-Assembler |
 |:---:|:---:|
-| ![Execution](docs/images/boardlens-1.png) | ![OLED Display](docs/images/boardlens-2.png) |
-| ![SRAM Benchmark](docs/images/boardlens-3.png) | ![Logic Analyzer](docs/images/boardlens-4.png) |
+| ![Execution](docs/images/boardlens-1.png) | ![Code Editor](docs/images/boardlens-2.png) |
+| **Responsive Multi-Device Layout** | **Logic Analyzer & Telemetry** |
+| ![Responsive Adaptability](docs/images/boardlens-3.png) | ![Logic Analyzer](docs/images/boardlens-4.png) |
 
 BoardLens simulates 32-bit microcontrollers at the instruction cycle and bus transaction level. It combines a RISC-V RV32I execution engine with memory-mapped peripherals, authentic serial communication protocols, an SSD1306 OLED display emulator, a Value Change Dump (VCD) waveform generator, an integrated assembler/disassembler, a Typer command-line interface, and an interactive FastAPI Web Studio.
 

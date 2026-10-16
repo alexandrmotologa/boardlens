@@ -56,4 +56,7 @@ Thumbs.db
 scratch/
 tmp/
 docs/frames/
-
+# Node & JS artifacts
+node_modules/
+package.json
+package-lock.json

@@ -69,8 +69,15 @@ function renderOled(pixels) {
   }
 }
 
+let latestWaveformSamples = [];
+
 function drawWaveforms(samples) {
   if (!waveformCanvas || !waveCtx) return;
+  if (samples && samples.length) {
+    latestWaveformSamples = samples;
+  } else {
+    samples = latestWaveformSamples;
+  }
   const w = waveformCanvas.width;
   const h = waveformCanvas.height;
 
@@ -546,4 +553,11 @@ window.addEventListener("DOMContentLoaded", () => {
       fetchWaveform();
     }
   }, 500);
+});
+
+window.addEventListener("resize", () => {
+  if (waveformCanvas && waveformCanvas.parentElement) {
+    waveformCanvas.width = waveformCanvas.parentElement.clientWidth || 600;
+    drawWaveforms(latestWaveformSamples);
+  }
 });

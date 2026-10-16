@@ -1,0 +1,222 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <clipPath id="squircle-clip">
+      <rect x="24" y="24" width="976" height="976" rx="220" />
+    </clipPath>
+
+    <linearGradient id="cyan-glow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="50%" stop-color="#00f5ff"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+
+    <linearGradient id="eye-lens-left" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="40%" stop-color="#00f5ff"/>
+      <stop offset="100%" stop-color="#0369a1"/>
+    </linearGradient>
+
+    <linearGradient id="eye-lens-right" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="40%" stop-color="#00f5ff"/>
+      <stop offset="100%" stop-color="#0369a1"/>
+    </linearGradient>
+
+    <linearGradient id="armor-grad-light" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#475569"/>
+      <stop offset="100%" stop-color="#334155"/>
+    </linearGradient>
+
+    <linearGradient id="armor-grad-mid" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+
+    <linearGradient id="armor-grad-dark" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+
+    <linearGradient id="beak-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#090d16"/>
+    </linearGradient>
+
+    <filter id="subtle-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#000000" flood-opacity="0.16" />
+    </filter>
+  </defs>
+
+  <!-- Luxury White Squircle Container -->
+  <rect x="24" y="24" width="976" height="976" rx="220" fill="#ffffff" stroke="#e2e8f0" stroke-width="6" />
+
+  <g clip-path="url(#squircle-clip)">
+    <g transform="translate(512, 512)" filter="url(#subtle-shadow)">
+
+      <!-- Hexagonal Architectural Gateway -->
+      <polygon points="
+        0,-390
+        338,-195
+        338,195
+        0,390
+        -338,195
+        -338,-195
+      " fill="#0b0f19" stroke="#0f172a" stroke-width="40" stroke-linejoin="round" />
+
+      <!-- Inner Precision Cyan Alignment Ring -->
+      <polygon points="
+        0,-355
+        307,-177
+        307,177
+        0,355
+        -307,177
+        -307,-177
+      " fill="none" stroke="#00f5ff" stroke-width="4" opacity="0.4" stroke-dasharray="16, 12" />
+
+      <!-- 100% Watertight Solid Base Silhouette (Zero-Leak Rule) -->
+      <path d="
+        M 0,-175
+        L 95,-155
+        L 185,-295
+        L 230,-170
+        L 260,-40
+        L 255,80
+        L 215,200
+        L 135,295
+        L 0,335
+        L -135,295
+        L -215,200
+        L -255,80
+        L -260,-40
+        L -230,-170
+        L -185,-295
+        L -95,-155
+        Z
+      " fill="#0b0f19" />
+
+      <!-- Low-Poly Origami Sentinel Owl Facets -->
+
+      <!-- Head Crest & Ear Tufts (Horns) -->
+      <!-- Left Ear Horn -->
+      <polygon points="-185,-295 -95,-155 -150,-150" fill="#475569" />
+      <polygon points="-185,-295 -150,-150 -230,-170" fill="#334155" />
+      <!-- Right Ear Horn -->
+      <polygon points="185,-295 150,-150 95,-155" fill="#64748b" />
+      <polygon points="185,-295 230,-170 150,-150" fill="#475569" />
+
+      <!-- Forehead Crown Center -->
+      <polygon points="0,-175 -95,-155 0,-105" fill="#334155" />
+      <polygon points="0,-175 0,-105 95,-155" fill="#475569" />
+      <polygon points="-95,-155 -150,-150 -105,-85" fill="#1e293b" />
+      <polygon points="95,-155 105,-85 150,-150" fill="#334155" />
+
+      <!-- Upper Facial Discs / Brow Shelves -->
+      <polygon points="0,-105 -105,-85 0,-50" fill="#1e293b" />
+      <polygon points="0,-105 0,-50 105,-85" fill="#334155" />
+      <polygon points="-105,-85 -190,-100 -140,-35" fill="#334155" />
+      <polygon points="105,-85 140,-35 190,-100" fill="#475569" />
+      <polygon points="-190,-100 -230,-170 -150,-150" fill="#1e293b" />
+      <polygon points="190,-100 150,-150 230,-170" fill="#334155" />
+
+      <!-- Lateral Cheeks / Temporal Plates -->
+      <polygon points="-190,-100 -260,-40 -195,10" fill="#1e293b" />
+      <polygon points="190,-100 195,10 260,-40" fill="#334155" />
+      <polygon points="-190,-100 -140,-35 -195,10" fill="#0f172a" />
+      <polygon points="190,-100 195,10 140,-35" fill="#1e293b" />
+      <polygon points="-260,-40 -255,80 -185,95" fill="#0f172a" />
+      <polygon points="260,-40 185,95 255,80" fill="#1e293b" />
+      <polygon points="-195,10 -255,80 -185,95" fill="#1e293b" />
+      <polygon points="195,10 185,95 255,80" fill="#334155" />
+
+      <!-- Eye Socket Recesses (Obsidian Dark) -->
+      <polygon points="-105,-85 -140,-35 -80,-15" fill="#0b0f19" />
+      <polygon points="105,-85 80,-15 140,-35" fill="#0f172a" />
+      <polygon points="-105,-85 -80,-15 0,-50" fill="#0f172a" />
+      <polygon points="105,-85 0,-50 80,-15" fill="#1e293b" />
+
+      <!-- TELESCOPIC LENS APERTURE RINGS (Negative Space / Lens Metaphor) -->
+      <!-- Left Optical Lens Barrel -->
+      <circle cx="-95" cy="-45" r="46" fill="#0b0f19" stroke="#1e293b" stroke-width="4" />
+      <circle cx="-95" cy="-45" r="40" fill="none" stroke="#00f5ff" stroke-width="2.5" opacity="0.75" stroke-dasharray="10, 4" />
+      <!-- Right Optical Lens Barrel -->
+      <circle cx="95" cy="-45" r="46" fill="#0b0f19" stroke="#334155" stroke-width="4" />
+      <circle cx="95" cy="-45" r="40" fill="none" stroke="#00f5ff" stroke-width="2.5" opacity="0.75" stroke-dasharray="10, 4" />
+
+      <!-- PREDATOR LENS OPTICS (Almond Eyes with Cyan Gradient & Slit Sensor) -->
+      <!-- Left Eye -->
+      <path d="M -135,-45 Q -95,-75 -55,-45 Q -95,-22 -135,-45 Z" fill="url(#eye-lens-left)" />
+      <!-- Right Eye -->
+      <path d="M 135,-45 Q 95,-75 55,-45 Q 95,-22 135,-45 Z" fill="url(#eye-lens-right)" />
+
+      <!-- Focused Vertical Optical Sensors / Core Pixels -->
+      <polygon points="-98,-60 -92,-60 -90,-45 -92,-30 -98,-30 -100,-45" fill="#030712" />
+      <polygon points="92,-60 98,-60 100,-45 98,-30 92,-30 90,-45" fill="#030712" />
+      <circle cx="-95" cy="-48" r="2.5" fill="#ffffff" opacity="0.9" />
+      <circle cx="95" cy="-48" r="2.5" fill="#ffffff" opacity="0.9" />
+
+      <!-- Titanium Beak (Geometric Sensor Wedge) -->
+      <polygon points="0,-50 -22,15 0,75" fill="url(#beak-grad)" />
+      <polygon points="0,-50 0,75 22,15" fill="#475569" />
+      <polygon points="-22,15 0,110 0,75" fill="#090d16" />
+      <polygon points="22,15 0,75 0,110" fill="#334155" />
+
+      <!-- Lower Face / Chin Shield -->
+      <polygon points="-80,-15 -22,15 -70,75" fill="#1e293b" />
+      <polygon points="80,-15 70,75 22,15" fill="#334155" />
+      <polygon points="-22,15 0,75 -70,75" fill="#0f172a" />
+      <polygon points="22,15 70,75 0,75" fill="#1e293b" />
+      <polygon points="-70,75 0,110 0,150" fill="#1e293b" />
+      <polygon points="70,75 0,150 0,110" fill="#334155" />
+      <polygon points="-70,75 0,150 -115,160" fill="#0f172a" />
+      <polygon points="70,75 115,160 0,150" fill="#1e293b" />
+
+      <!-- Cheek Outer Plates -->
+      <polygon points="-140,-35 -80,-15 -135,55" fill="#1e293b" />
+      <polygon points="140,-35 135,55 80,-15" fill="#334155" />
+      <polygon points="-80,-15 -70,75 -135,55" fill="#0f172a" />
+      <polygon points="80,-15 135,55 70,75" fill="#1e293b" />
+      <polygon points="-135,55 -70,75 -115,160" fill="#1e293b" />
+      <polygon points="135,55 115,160 70,75" fill="#334155" />
+      <polygon points="-195,10 -185,95 -135,55" fill="#0f172a" />
+      <polygon points="195,10 135,55 185,95" fill="#1e293b" />
+      <polygon points="-185,95 -155,185 -115,160" fill="#1e293b" />
+      <polygon points="185,95 115,160 155,185" fill="#334155" />
+      <polygon points="-185,95 -215,200 -155,185" fill="#0f172a" />
+      <polygon points="185,95 155,185 215,200" fill="#1e293b" />
+
+      <!-- Chest / Breast Armor (Structured Low-Poly Plumage) -->
+      <!-- Center Gorget -->
+      <polygon points="0,150 -60,215 0,265" fill="#1e293b" />
+      <polygon points="0,150 0,265 60,215" fill="#334155" />
+      <polygon points="-115,160 -60,215 0,150" fill="#334155" />
+      <polygon points="115,160 0,150 60,215" fill="#475569" />
+
+      <!-- Lateral Breast Plates -->
+      <polygon points="-115,160 -155,185 -125,255" fill="#1e293b" />
+      <polygon points="115,160 125,255 155,185" fill="#334155" />
+      <polygon points="-115,160 -125,255 -60,215" fill="#0f172a" />
+      <polygon points="115,160 -60,215 125,255" fill="#1e293b" />
+      <polygon points="-155,185 -215,200 -180,270" fill="#0f172a" />
+      <polygon points="155,185 180,270 215,200" fill="#1e293b" />
+      <polygon points="-155,185 -180,270 -125,255" fill="#1e293b" />
+      <polygon points="155,185 125,255 180,270" fill="#334155" />
+
+      <!-- Lower Keel / Apex Prow -->
+      <polygon points="0,265 -60,215 -55,305" fill="#0f172a" />
+      <polygon points="0,265 55,305 60,215" fill="#1e293b" />
+      <polygon points="0,265 -55,305 0,335" fill="#1e293b" />
+      <polygon points="0,265 0,335 55,305" fill="#334155" />
+      <polygon points="-60,215 -125,255 -55,305" fill="#1e293b" />
+      <polygon points="60,215 55,305 125,255" fill="#334155" />
+      <polygon points="-125,255 -180,270 -135,295" fill="#0f172a" />
+      <polygon points="125,255 135,295 180,270" fill="#1e293b" />
+      <polygon points="-125,255 -135,295 -55,305" fill="#1e293b" />
+      <polygon points="125,255 -55,305 135,295" fill="#334155" />
+
+      <!-- Subtle Electric Cyan Core Bus Indicator on Keel -->
+      <circle cx="0" cy="235" r="5" fill="#00f5ff" opacity="0.9" />
+      <line x1="0" y1="240" x2="0" y2="300" stroke="#00f5ff" stroke-width="2" opacity="0.75" />
+
+    </g>
+  </g>
+</svg>
