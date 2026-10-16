@@ -1,5 +1,6 @@
 """Hardware MMIO peripherals for BoardLens."""
 
+from boardlens.peripherals.adc import ADCPeripheral
 from boardlens.peripherals.base import Peripheral
 from boardlens.peripherals.gpio import GPIOPort
 from boardlens.peripherals.i2c import I2CController, I2CDevice
@@ -13,4 +14,6 @@ __all__ = [
     "SysTickTimer",
     "I2CController",
     "I2CDevice",
+    "ADCPeripheral",
 ]
+

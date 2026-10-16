@@ -7,11 +7,13 @@ from boardlens.cpu.rv32i.core import RV32ICore
 from boardlens.devices.ssd1306 import SSD1306
 from boardlens.memory.bus import BusTransaction, MemoryBus
 from boardlens.memory.ram import RAM
+from boardlens.peripherals.adc import ADCPeripheral
 from boardlens.peripherals.gpio import GPIOPort
 from boardlens.peripherals.i2c import I2CController
 from boardlens.peripherals.timer import SysTickTimer
 from boardlens.peripherals.uart import UARTPeripheral
 from boardlens.tooling.assembler import assemble
+from boardlens.tooling.elf_loader import ELF32
 from boardlens.tooling.vcd import VCDTracer
 
 
@@ -27,6 +29,7 @@ class Board:
     UART_BASE = 0x40001000
     TIMER_BASE = 0x40002000
     I2C_BASE = 0x40003000
+    ADC_BASE = 0x40004000
 
     def __init__(self, core: str = "rv32i", enable_vcd: bool = False) -> None:
         self.core_type = core.lower()
@@ -43,11 +46,13 @@ class Board:
         self.uart = UARTPeripheral(self.UART_BASE, name="UART0")
         self.timer = SysTickTimer(self.TIMER_BASE, name="SysTick")
         self.i2c = I2CController(self.I2C_BASE, name="I2C0")
+        self.adc = ADCPeripheral(self.ADC_BASE, name="ADC0")
 
         self.bus.map_region(self.gpio)
         self.bus.map_region(self.uart)
         self.bus.map_region(self.timer)
         self.bus.map_region(self.i2c)
+        self.bus.map_region(self.adc)
 
         # Virtual Hardware Devices
         self.oled = SSD1306(address=0x3C)
@@ -134,6 +139,7 @@ class Board:
         self.uart.reset()
         self.timer.reset()
         self.i2c.reset()
+        self.adc.reset()
         self.oled.clear()
         self.cpu.reset(initial_pc=self.FLASH_BASE)
 
@@ -155,6 +161,7 @@ class Board:
         self.gpio.step(cycles=cycles)
         self.uart.step(cycles=cycles)
         self.i2c.step(cycles=cycles)
+        self.adc.step(cycles=cycles)
 
         if self.vcd:
             t = self.cpu.cycles * 10
