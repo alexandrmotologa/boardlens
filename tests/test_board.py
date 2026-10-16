@@ -87,3 +87,20 @@ def test_board_telemetry_status():
     assert "registers" in status
     assert len(status["gpio"]["pins"]) == 16
     assert "oled" in status
+
+
+def test_board_load_elf():
+    from boardlens.tooling.assembler import assemble
+    from boardlens.tooling.elf_loader import create_minimal_elf32
+
+    code = assemble("addi a0, zero, 99\nebreak\n")
+    elf_bytes = create_minimal_elf32(code, entry_addr=0x00000000, symbols={"main": 0x00000000})
+
+    board = Board(core="rv32i")
+    board.load_flash(elf_bytes)
+    assert "main" in board.symbol_names
+    assert board.symbols[0x00000000].name == "main"
+
+    res = board.run(max_cycles=100)
+    assert res.trap == TrapCause.BREAKPOINT
+    assert board.cpu.registers.read("a0") == 99

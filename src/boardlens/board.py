@@ -99,15 +99,30 @@ class Board:
         return self.vcd
 
     def load_flash(self, data: Union[bytes, bytearray, str]) -> None:
-        """Load firmware image. If a string is provided, assemble it as RV32I source."""
+        """Load firmware image. Supports assembly strings, raw binaries, or ELF32 executables."""
         if isinstance(data, str):
             binary = assemble(data, base_address=self.FLASH_BASE)
+            self.loaded_image = binary
+            self.symbols = {}
+            self.symbol_names = {}
+            self.flash.load_bytes(0, binary)
+            self.reset()
+        elif bytes(data).startswith(b"\x7fELF"):
+            from boardlens.tooling.elf_loader import ELF32
+            elf = ELF32(bytes(data))
+            self.symbols = elf.symbols
+            self.symbol_names = elf.symbol_names
+            self.loaded_image = bytes(data)
+            self.reset()
+            entry = elf.load_into_bus(self.bus)
+            self.cpu.pc = entry
         else:
             binary = bytes(data)
-
-        self.loaded_image = binary
-        self.flash.load_bytes(0, binary)
-        self.reset()
+            self.loaded_image = binary
+            self.symbols = {}
+            self.symbol_names = {}
+            self.flash.load_bytes(0, binary)
+            self.reset()
 
     def reset(self) -> None:
         """Reset CPU, bus, peripherals, and device states."""
