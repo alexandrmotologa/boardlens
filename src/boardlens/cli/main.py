@@ -14,6 +14,7 @@ from boardlens.cpu.base import TrapCause
 from boardlens.peripherals.gpio import GPIOPort
 from boardlens.tooling.assembler import assemble
 from boardlens.tooling.disassembler import format_disassembly
+from boardlens.tooling.gdb_server import GDBServer
 
 app = typer.Typer(
     name="boardlens",
@@ -173,8 +174,36 @@ def info() -> None:
     table.add_row("0x40001000", "0x400013FF", "1 KB", "UART0 Serial", "R/W")
     table.add_row("0x40002000", "0x400023FF", "1 KB", "SysTick Timer", "R/W")
     table.add_row("0x40003000", "0x400033FF", "1 KB", "I2C0 Controller", "R/W")
+    table.add_row("0x40004000", "0x400043FF", "1 KB", "ADC0 12-bit Converter", "R/W")
 
     console.print(table)
+
+
+@app.command(name="gdb-server")
+def gdb_server_cmd(
+    source_file: Optional[Path] = typer.Option(None, "--bin", "-b", help="Firmware file to pre-load (.bin, .elf, or .s)."),
+    core: str = typer.Option("rv32i", "--core", "-m", help="Processor core: rv32i or arm."),
+    host: str = typer.Option("127.0.0.1", "--host", "-h", help="GDB stub bind host."),
+    port: int = typer.Option(3333, "--port", "-p", help="GDB stub TCP port."),
+) -> None:
+    """Run an authentic GDB Remote Serial Protocol (RSP) stub server."""
+    board = Board(core=core)
+    if source_file:
+        data = source_file.read_bytes()
+        board.load_flash(data)
+        console.print(f"[bold green]Loaded firmware into flash:[/bold green] {source_file}")
+
+    server = GDBServer(board, host=host, port=port)
+    console.print(f"[bold cyan]BoardLens GDB Server listening on {host}:{port}[/bold cyan] ({core.upper()})...")
+    console.print(f"[dim]Connect with: gdb-multiarch -ex 'target remote {host}:{port}'[/dim]")
+    server.start()
+    try:
+        import time
+        while server.running:
+            time.sleep(0.5)
+    except KeyboardInterrupt:
+        console.print("\n[yellow]Stopping GDB server...[/yellow]")
+        server.stop()
 
 
 @app.command()
@@ -190,3 +219,4 @@ def studio(
 
 if __name__ == "__main__":
     app()
+

@@ -7,6 +7,7 @@ from boardlens.tooling.disassembler import (
     format_disassembly,
 )
 from boardlens.tooling.elf_loader import ELF32, ELFError, create_minimal_elf32
+from boardlens.tooling.gdb_server import GDBServer
 from boardlens.tooling.vcd import VCDTracer
 
 __all__ = [
@@ -19,5 +20,7 @@ __all__ = [
     "ELF32",
     "ELFError",
     "create_minimal_elf32",
+    "GDBServer",
     "VCDTracer",
 ]
+

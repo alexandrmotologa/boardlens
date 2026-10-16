@@ -3,7 +3,8 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional
+from typing import Any, Optional
+
 
 
 class TrapCause(Enum):
@@ -71,3 +72,9 @@ class CPUCore(ABC):
     def cycles(self) -> int:
         """Cumulative executed clock cycles."""
         pass
+
+    @property
+    def regs(self) -> Any:
+        """Convenience alias for cpu.registers."""
+        return getattr(self, "registers", None)
+
