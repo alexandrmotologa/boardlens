@@ -1,6 +1,6 @@
 """Authentic SSD1306 128x64 OLED display controller emulation via I2C."""
 
-from typing import Callable, List, Optional
+from typing import Any, Callable, List, Optional
 from boardlens.peripherals.i2c import I2CDevice
 
 
@@ -47,6 +47,15 @@ class SSD1306(I2CDevice):
 
         # Change listeners
         self._frame_listeners: List[Callable[[], None]] = []
+        self._gfx: Optional[Any] = None
+
+    @property
+    def gfx(self) -> Any:
+        """Access 2D graphics primitives and 5x7 font engine for this display."""
+        if self._gfx is None:
+            from boardlens.devices.graphics import SSD1306GFX
+            self._gfx = SSD1306GFX(self)
+        return self._gfx
 
     def add_frame_listener(self, listener: Callable[[], None]) -> None:
         """Register a callback invoked when display memory changes."""
@@ -186,21 +195,22 @@ class SSD1306(I2CDevice):
             self._pending_command = cmd
             self._pending_bytes.clear()
 
-    def get_pixel(self, x: int, y: int) -> bool:
-        """Check if pixel at (x, y) is illuminated."""
+    def get_pixel(self, x: int, y: int, raw: bool = False) -> bool:
+        """Check if pixel at (x, y) is illuminated on screen (or set in GDDRAM if raw=True)."""
         if not (0 <= x < self.WIDTH and 0 <= y < self.HEIGHT):
             return False
-        if not self.display_on:
-            return False
-        if self.entire_display_on:
-            return True
+        if not raw:
+            if not self.display_on:
+                return False
+            if self.entire_display_on:
+                return True
 
         page = y // 8
         bit = y % 8
         idx = (page * self.WIDTH) + x
         val = bool((self._gddram[idx] >> bit) & 1)
 
-        return not val if self.inverted else val
+        return not val if (self.inverted and not raw) else val
 
     def set_pixel(self, x: int, y: int, on: bool = True) -> None:
         """Directly write a single pixel to GDDRAM."""
