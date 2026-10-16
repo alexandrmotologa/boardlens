@@ -33,6 +33,36 @@ def get_font(size: int, bold: bool = False):
         return ImageFont.load_default()
 
 
+def draw_vcenter_text(draw, x: float, y_center: float, text: str, font, fill: tuple):
+    """Draw text vertically centered around y_center."""
+    bbox = draw.textbbox((0, 0), text, font=font)
+    th = bbox[3] - bbox[1]
+    ty = y_center - th / 2.0 - bbox[1]
+    draw.text((x, ty), text, fill=fill, font=font)
+
+
+def draw_centered_box_text(
+    draw,
+    box: list[int],
+    text: str,
+    font,
+    fill: tuple,
+    bg: tuple | None = None,
+    outline: tuple | None = None,
+    radius: int = 4,
+):
+    """Draw a rounded box and center text perfectly both horizontally and vertically."""
+    x0, y0, x1, y1 = box
+    if bg is not None or outline is not None:
+        draw.rounded_rectangle([x0, y0, x1, y1], radius=radius, fill=bg, outline=outline)
+    bbox = draw.textbbox((0, 0), text, font=font)
+    tw = bbox[2] - bbox[0]
+    th = bbox[3] - bbox[1]
+    tx = x0 + ((x1 - x0) - tw) / 2.0 - bbox[0]
+    ty = y0 + ((y1 - y0) - th) / 2.0 - bbox[1]
+    draw.text((tx, ty), text, fill=fill, font=font)
+
+
 def render_dashboard_frame(
     pc_hex: str,
     cycle_num: int,
@@ -52,38 +82,79 @@ def render_dashboard_frame(
     f_mono_bold = get_font(12, bold=True)
     f_mono_small = get_font(10, bold=False)
 
-    # 1. Header Bar
+    # 1. Header Bar (height: 50, center line y=25)
     draw.rectangle([0, 0, width, 50], fill=CARD_BG)
     draw.line([0, 50, width, 50], fill=CARD_BORDER, width=1)
 
-    draw.text((20, 15), "BoardLens Studio", fill=TEXT_WHITE, font=f_title)
-    # Badge: RV32I Core
-    draw.rounded_rectangle([195, 16, 280, 36], radius=4, fill=(10, 40, 55), outline=ACCENT_CYAN)
-    draw.text((205, 18), "RV32I Core", fill=ACCENT_CYAN, font=f_header)
+    draw_vcenter_text(draw, 20, 25, "BoardLens Studio", f_title, TEXT_WHITE)
 
-    # Status
+    # Badge: RV32I Core (height: 24, y from 13 to 37, center 25)
+    draw_centered_box_text(
+        draw,
+        [205, 13, 295, 37],
+        "RV32I Core",
+        f_header,
+        ACCENT_CYAN,
+        bg=(10, 40, 55),
+        outline=ACCENT_CYAN,
+        radius=4,
+    )
+
+    # Status Badge (height: 24, y from 13 to 37, center 25)
     status_text = "RUNNING" if not (cycle_num > 40) else "TRAP BREAKPOINT"
     status_color = ACCENT_EMERALD if "RUNNING" in status_text else ACCENT_ROSE
-    draw.rounded_rectangle([290, 16, 435, 36], radius=4, fill=(10, 35, 25), outline=status_color)
-    draw.text((300, 18), status_text, fill=status_color, font=f_header)
+    status_bg = (10, 35, 25) if "RUNNING" in status_text else (40, 15, 25)
+    draw_centered_box_text(
+        draw,
+        [305, 13, 445, 37],
+        status_text,
+        f_header,
+        status_color,
+        bg=status_bg,
+        outline=status_color,
+        radius=4,
+    )
 
-    # Cycle & PC
-    draw.text((820, 18), f"{cycle_num:,} cycles", fill=TEXT_MUTED, font=f_mono)
-    draw.text((950, 18), f"PC: {pc_hex}", fill=ACCENT_CYAN, font=f_mono_bold)
+    # Cycle & PC (center line y=25)
+    draw_vcenter_text(draw, 810, 25, f"{cycle_num:,} cycles", f_mono, TEXT_MUTED)
+    draw_vcenter_text(draw, 940, 25, f"PC: {pc_hex}", f_mono_bold, ACCENT_CYAN)
 
-    # Buttons
-    draw.rounded_rectangle([1100, 13, 1215, 38], radius=6, fill=ACCENT_CYAN)
-    draw.text((1125, 18), "Step ⏭", fill=(3, 7, 18), font=f_header)
+    # Button: Step >> (height: 26, y from 12 to 38, center 25)
+    draw_centered_box_text(
+        draw,
+        [1095, 12, 1215, 38],
+        "Step  >>",
+        f_header,
+        (3, 7, 18),
+        bg=ACCENT_CYAN,
+        radius=6,
+    )
 
     # 2. Left Column: Disassembly & Editor (330px)
     draw.rectangle([16, 62, 346, 755], fill=CARD_BG, outline=CARD_BORDER)
     draw.rectangle([16, 62, 346, 96], fill=CARD_HEADER_BG)
 
-    # Tab Buttons
-    draw.rounded_rectangle([22, 68, 125, 90], radius=4, fill=CARD_BG, outline=CARD_BORDER)
-    draw.text((30, 72), "Disassembly", fill=ACCENT_CYAN, font=f_header)
-    draw.text((140, 72), "Code Editor", fill=TEXT_MUTED, font=f_header)
-    draw.text((250, 73), "Flash ROM", fill=(100, 116, 139), font=f_mono_small)
+    # Tab Buttons (y from 68 to 90, height 22, center 79)
+    draw_centered_box_text(
+        draw,
+        [22, 68, 125, 90],
+        "Disassembly",
+        f_header,
+        ACCENT_CYAN,
+        bg=CARD_BG,
+        outline=CARD_BORDER,
+        radius=4,
+    )
+    draw_centered_box_text(
+        draw,
+        [135, 68, 230, 90],
+        "Code Editor",
+        f_header,
+        TEXT_MUTED,
+        bg=None,
+        radius=4,
+    )
+    draw_vcenter_text(draw, 248, 79, "Flash ROM", f_mono_small, (100, 116, 139))
 
     instructions = [
         ("00000000", "400002B7", "lui  t0, 0x40000"),
@@ -112,10 +183,10 @@ def render_dashboard_frame(
         y_off += 24
 
     # 3. Center Column: OLED, UART, and Logic Analyzer (530px)
-    # OLED Panel (y: 62 -> 310)
+    # OLED Panel (y: 62 -> 310, header height 32, center 78)
     draw.rectangle([362, 62, 892, 310], fill=CARD_BG, outline=CARD_BORDER)
     draw.rectangle([362, 62, 892, 94], fill=CARD_HEADER_BG)
-    draw.text((375, 72), "SSD1306 OLED (128x64 I2C 0x3C)", fill=TEXT_MUTED, font=f_header)
+    draw_vcenter_text(draw, 375, 78, "SSD1306 OLED (128x64 I2C 0x3C)", f_header, TEXT_MUTED)
 
     draw.rectangle([440, 108, 810, 260], fill=(3, 7, 18), outline=(51, 65, 85), width=2)
     draw.text((460, 122), "BOARDLENS SIMULATOR", fill=OLED_BLUE, font=f_header)
@@ -126,20 +197,20 @@ def render_dashboard_frame(
     draw.rectangle([460, 215, 460 + bar_width, 228], fill=OLED_BLUE)
     draw.rectangle([460, 215, 770, 228], outline=OLED_BLUE, width=1)
 
-    # UART Panel (y: 320 -> 525)
+    # UART Panel (y: 320 -> 525, header height 30, center 335)
     draw.rectangle([362, 320, 892, 525], fill=CARD_BG, outline=CARD_BORDER)
     draw.rectangle([362, 320, 892, 350], fill=CARD_HEADER_BG)
-    draw.text((375, 328), "UART0 SERIAL CONSOLE (115200 BAUD)", fill=TEXT_MUTED, font=f_header)
+    draw_vcenter_text(draw, 375, 335, "UART0 SERIAL CONSOLE (115200 BAUD)", f_header, TEXT_MUTED)
     draw.rectangle([375, 360, 880, 480], fill=(3, 7, 18))
     draw.text((385, 368), f"> Initializing MMIO peripherals...\n> UART0 TX/RX FIFO Ready\n> ADC0 12-bit Ready (3300 mV)\n{uart_text}", fill=ACCENT_EMERALD, font=f_mono)
     draw.rectangle([375, 490, 880, 515], fill=(26, 36, 60), outline=CARD_BORDER)
-    draw.text((385, 495), "boardlens-cli> run --cycles 5000", fill=TEXT_WHITE, font=f_mono)
+    draw_vcenter_text(draw, 385, 502.5, "boardlens-cli> run --cycles 5000", f_mono, TEXT_WHITE)
 
-    # Digital Logic Analyzer Waveform Panel (y: 535 -> 755)
+    # Digital Logic Analyzer Waveform Panel (y: 535 -> 755, header height 28, center 549)
     draw.rectangle([362, 535, 892, 755], fill=CARD_BG, outline=CARD_BORDER)
     draw.rectangle([362, 535, 892, 563], fill=CARD_HEADER_BG)
-    draw.text((375, 542), "DIGITAL LOGIC ANALYZER (64 SAMPLES)", fill=TEXT_MUTED, font=f_header)
-    draw.text((700, 543), "CLK • PC • ADDR • WE • PA5 • TX", fill=(100, 116, 139), font=f_mono_small)
+    draw_vcenter_text(draw, 375, 549, "DIGITAL LOGIC ANALYZER (64 SAMPLES)", f_header, TEXT_MUTED)
+    draw_vcenter_text(draw, 690, 549, "CLK • PC • ADDR • WE • PA5 • TX", f_mono_small, (100, 116, 139))
 
     # Waveform Canvas area
     draw.rectangle([375, 570, 880, 745], fill=(3, 7, 18), outline=(30, 41, 59))
@@ -189,10 +260,10 @@ def render_dashboard_frame(
                 draw.text((x0 + 4, y_mid - 4), lbl, fill=s_col, font=f_mono_small)
 
     # 4. Right Column: GPIO, 12-Bit ADC, Registers (320px)
-    # GPIO (y: 62 -> 195)
+    # GPIO (y: 62 -> 195, header height 30, center 77)
     draw.rectangle([908, 62, 1224, 195], fill=CARD_BG, outline=CARD_BORDER)
     draw.rectangle([908, 62, 1224, 92], fill=CARD_HEADER_BG)
-    draw.text((920, 72), "GPIO PORT A (LEDS)", fill=TEXT_MUTED, font=f_header)
+    draw_vcenter_text(draw, 920, 77, "GPIO PORT A (LEDS)", f_header, TEXT_MUTED)
 
     for i in range(16):
         col = i % 8
@@ -204,10 +275,10 @@ def render_dashboard_frame(
         draw.ellipse([px, py, px + 16, py + 16], fill=color, outline=(110, 231, 183) if (is_pin5 and led_on) else (71, 85, 105))
         draw.text((px, py + 18), f"P{i}", fill=TEXT_MUTED, font=f_mono_small)
 
-    # ADC0 12-Bit Analog Channels (y: 205 -> 355)
+    # ADC0 12-Bit Analog Channels (y: 205 -> 355, header height 30, center 220)
     draw.rectangle([908, 205, 1224, 355], fill=CARD_BG, outline=CARD_BORDER)
     draw.rectangle([908, 205, 1224, 235], fill=CARD_HEADER_BG)
-    draw.text((920, 214), "ADC0 12-BIT ANALOG INPUTS", fill=TEXT_MUTED, font=f_header)
+    draw_vcenter_text(draw, 920, 220, "ADC0 12-BIT ANALOG INPUTS", f_header, TEXT_MUTED)
 
     adc_channels = [
         ("CH0", "1.65 V (2048)", 0.50),
@@ -227,10 +298,10 @@ def render_dashboard_frame(
         draw.ellipse([thumb_x - 4, ay + 11, thumb_x + 6, ay + 21], fill=ACCENT_CYAN, outline=TEXT_WHITE)
         ay += 26
 
-    # RV32I Registers (y: 365 -> 755)
+    # RV32I Registers (y: 365 -> 755, header height 30, center 380)
     draw.rectangle([908, 365, 1224, 755], fill=CARD_BG, outline=CARD_BORDER)
     draw.rectangle([908, 365, 1224, 395], fill=CARD_HEADER_BG)
-    draw.text((920, 374), "RV32I REGISTERS", fill=TEXT_MUTED, font=f_header)
+    draw_vcenter_text(draw, 920, 380, "RV32I REGISTERS", f_header, TEXT_MUTED)
 
     regs_sample = [
         ("x0 (zero)", "0x00000000"),
@@ -262,37 +333,12 @@ def render_dashboard_frame(
 
 def main():
     print("Generating BoardLens screenshot assets...")
-    # 4 distinct authentic execution screenshots
-    s1 = render_dashboard_frame(
-        "0x00000008", 12, True, "> UART: Hello, BoardLens!\r\n> GPIO PA5 driven HIGH\r\n", 2, 2
-    )
-    s1.save(DOCS_IMAGES / "boardlens-1.png")
-
-    s2 = render_dashboard_frame(
-        "0x00000014",
-        24,
-        False,
-        "> UART: Transmitting frame 0xAF\r\n> SSD1306 Display ON confirmed\r\n",
-        4,
-        5,
-    )
-    s2.save(DOCS_IMAGES / "boardlens-2.png")
-
-    s3 = render_dashboard_frame(
-        "0x0000001C",
-        38,
-        True,
-        "> UART: Output benchmark complete\r\n> Fibonacci calculation stored in SRAM\r\n",
-        6,
-        7,
-    )
-    s3.save(DOCS_IMAGES / "boardlens-3.png")
-
+    # Generate boardlens-4.png showing breakpoint & deep execution
     s4 = render_dashboard_frame(
         "0x00000020",
         45,
         True,
-        "> All checks passed. Simulation halted at EBREAK.\r\n> VCD logic dump saved: trace.vcd\r\n",
+        "> Initializing MMIO peripherals...\r\n> UART0 TX/RX FIFO Ready\r\n> ADC0 12-bit Ready (3300 mV)\r\n> All checks passed. Simulation halted at EBREAK.\r\n> VCD logic dump saved: trace.vcd\r\n",
         8,
         8,
     )

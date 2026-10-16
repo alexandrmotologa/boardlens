@@ -39,6 +39,7 @@ header {
   justify-content: space-between;
   padding: 0 20px;
   flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .brand {
@@ -52,14 +53,25 @@ header {
   font-weight: 700;
   letter-spacing: -0.02em;
   color: #ffffff;
+  margin: 0;
+  line-height: 1;
+  display: flex;
+  align-items: center;
 }
 
 .badge {
   font-size: 0.72rem;
   font-weight: 600;
-  padding: 2px 8px;
+  padding: 0 10px;
+  height: 24px;
   border-radius: 9999px;
   text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  box-sizing: border-box;
+  vertical-align: middle;
 }
 
 .badge-core {
@@ -80,17 +92,32 @@ header {
   gap: 10px;
 }
 
+#cycleCounter,
+#pcDisplay {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.85rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+
 button {
   cursor: pointer;
   border: none;
   font-family: inherit;
   font-size: 0.82rem;
   font-weight: 600;
-  padding: 6px 14px;
+  padding: 0 14px;
+  height: 32px;
   border-radius: 6px;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  line-height: 1;
   gap: 6px;
+  box-sizing: border-box;
+  vertical-align: middle;
   transition: all 0.15s ease;
 }
 
@@ -127,11 +154,17 @@ select {
   background-color: var(--bg-card-sub);
   color: var(--text-main);
   border: 1px solid var(--border-color);
-  padding: 6px 12px;
+  padding: 0 12px;
+  height: 32px;
   border-radius: 6px;
   font-size: 0.82rem;
   font-weight: 500;
   outline: none;
+  display: inline-flex;
+  align-items: center;
+  line-height: 32px;
+  box-sizing: border-box;
+  vertical-align: middle;
 }
 
 /* Studio Layout */
@@ -160,12 +193,15 @@ select {
 }
 
 .card-header {
-  padding: 10px 14px;
+  height: 38px;
+  padding: 0 14px;
   background-color: var(--bg-card-sub);
   border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .card-header h2 {
@@ -174,6 +210,10 @@ select {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-muted);
+  line-height: 1;
+  margin: 0;
+  display: flex;
+  align-items: center;
 }
 
 .card-body {
@@ -411,11 +451,16 @@ footer {
 
 /* Tabs */
 .tab-header {
-  padding: 6px 12px;
+  height: 38px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
 }
 
 .tab-buttons {
   display: flex;
+  align-items: center;
   gap: 4px;
 }
 
@@ -424,9 +469,16 @@ footer {
   color: var(--text-muted);
   font-size: 0.75rem;
   font-weight: 600;
-  padding: 4px 10px;
+  padding: 0 12px;
+  height: 26px;
   border-radius: 4px;
   border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  box-sizing: border-box;
+  vertical-align: middle;
 }
 
 .tab-btn:hover {
@@ -442,12 +494,14 @@ footer {
 
 /* Code Editor */
 .editor-toolbar {
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 6px 10px;
+  padding: 0 10px;
   background: var(--bg-card-sub);
   border-bottom: 1px solid var(--border-color);
+  box-sizing: border-box;
 }
 
 .editor-status-text {
