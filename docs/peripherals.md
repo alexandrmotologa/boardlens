@@ -55,3 +55,34 @@ Master serial bus controller.
 
 Monochrome display controller with 128 columns and 64 rows (8 pages of 128 bytes).
 The controller parses I2C control bytes with Co and D/C# flags, separating command instructions from pixel bitmap data.
+
+### 2D Graphics and ASCII Font Engine (`boardlens.devices.graphics`)
+
+BoardLens bundles a 2D rasterizer and complete 5x7 ASCII font table (characters 32 to 126):
+- Bresenham lines, rectangles, rounded rectangles, triangles, and midpoint circles.
+- Text string rendering with character wrapping and scaling multipliers.
+- 1-bit monochrome bitmap drawing into display memory.
+
+## ADC0 Analog-to-Digital Converter (`0x40004000`)
+
+12-bit successive approximation analog-to-digital converter supporting 4 analog channels with 0 to 3300 mV voltage range.
+
+| Offset | Register | Reset Value | Access | Description |
+|:---|:---|:---:|:---:|:---|
+| `0x00` | SR | `0x00000000` | R/W | Status register (bit 1: EOC end of conversion, bit 0: AWD, bit 4: STRT) |
+| `0x04` | CR1 | `0x00000000` | R/W | Control register 1 (bit 5: EOCIE, bit 8: SCAN) |
+| `0x08` | CR2 | `0x00000000` | R/W | Control register 2 (bit 0: ADON, bit 1: CONT, bit 30/22: SWSTART) |
+| `0x0C` | SMPR | `0x00000000` | R/W | Channel sampling time register |
+| `0x10` | DR | `0x00000000` | R | 12-bit conversion result register (0 to 4095). Reading clears EOC |
+| `0x14` | SQR | `0x00000000` | R/W | Sequence register (bits 0-3 select active conversion channel) |
+| `0x20` | CH0 | `0x00000000` | R/W | Channel 0 voltage in millivolts (0 to 3300 mV) |
+| `0x24` | CH1 | `0x00000000` | R/W | Channel 1 voltage in millivolts (0 to 3300 mV) |
+| `0x28` | CH2 | `0x00000000` | R/W | Channel 2 voltage in millivolts (0 to 3300 mV) |
+| `0x2C` | CH3 | `0x00000000` | R/W | Channel 3 voltage in millivolts (0 to 3300 mV) |
+
+### Conversion Formula
+
+Digital output values match real microcontroller conversion formulas:
+
+$$\text{DR} = \text{round}\left(\frac{V_{\text{in}}\text{ [mV]}}{3300\text{ mV}} \times 4095\right)$$
+

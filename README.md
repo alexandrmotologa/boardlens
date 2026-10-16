@@ -8,7 +8,13 @@ Virtual microcontroller and hardware logic simulator for embedded systems engine
 
 ![BoardLens Demo](docs/images/boardlens_demo.gif)
 
+| Real-Time Execution | Peripheral Traces |
+|:---:|:---:|
+| ![Execution](docs/images/boardlens-1.png) | ![OLED Display](docs/images/boardlens-2.png) |
+| ![SRAM Benchmark](docs/images/boardlens-3.png) | ![Logic Analyzer](docs/images/boardlens-4.png) |
+
 BoardLens simulates 32-bit microcontrollers at the instruction cycle and bus transaction level. It combines a RISC-V RV32I execution engine with memory-mapped peripherals, authentic serial communication protocols, an SSD1306 OLED display emulator, a Value Change Dump (VCD) waveform generator, an integrated assembler/disassembler, a Typer command-line interface, and an interactive FastAPI Web Studio.
+
 
 ---
 
@@ -23,9 +29,13 @@ BoardLens simulates 32-bit microcontrollers at the instruction cycle and bus tra
   - **Hardware Timer / SysTick**: Periodic counter, auto-reload, and tick event generation.
   - **I2C Bus Controller**: Multi-state transaction engine supporting START, 7-bit addressing, ACK/NACK handshake, data payload transfer, and STOP condition handling.
 - **SSD1306 OLED Virtual Device**: 128x64 monochrome display attached via I2C address 0x3C. Emulates GDDRAM page/column addressing, contrast control, display inversion, and bitmap rendering.
+- **2D Graphics & ASCII Font Engine**: Built-in primitives library for drawing lines, rectangles, rounded boxes, circles, triangles, text strings with word wrapping, and 1-bit monochrome bitmaps.
+- **12-Bit ADC Peripheral**: Multi-channel successive approximation analog converter mapped at `0x40004000` supporting 0 to 3300 mV inputs with single and continuous conversion modes.
+- **ELF32 Executable Loader**: Parses standard ELF32 headers, program headers (`PT_LOAD`), sections, and symbol tables (`.symtab` / `.strtab`) for direct execution of GCC/Clang compiled binaries.
+- **GDB Remote Serial Protocol (RSP) Server**: Embedded GDB stub server listening on TCP port 3333 for remote debugging with `gdb-multiarch` (breakpoints, memory inspection, registers, step, continue).
 - **Logic Analyzer & VCD Trace Export**: Generates IEEE 1364-1995 standard Value Change Dump files for waveform inspection in PulseView or GTKWave.
 - **Integrated RV32I Assembler & Disassembler**: Assembles assembly source code with label resolution and pseudo-instructions (`li`, `la`, `mv`, `nop`, `j`, `ret`).
-- **Web Studio & Live Telemetry**: FastAPI backend with WebSocket streaming, interactive register inspection, RAM viewer, GPIO LED/button toggles, serial console, and live canvas OLED rendering.
+- **Web Studio & Live Telemetry**: FastAPI backend with WebSocket streaming, interactive register inspection, RAM viewer, GPIO LED/button toggles, serial console, analog voltage sliders, live code editor, and canvas digital logic analyzer.
 
 ---
 
@@ -54,10 +64,12 @@ flowchart TD
         UART["UART Serial (0x40001000)"]
         TIMER["SysTick Timer (0x40002000)"]
         I2C["I2C Master Controller (0x40003000)"]
+        ADC["ADC 12-Bit Converter (0x40004000)"]
     end
 
-    subgraph Devices ["Virtual Hardware"]
+    subgraph Devices ["Virtual Hardware & Debugging"]
         OLED["SSD1306 OLED 128x64 (I2C 0x3C)"]
+        GDB["GDB RSP Server (Port 3333)"]
         VCD["VCD Logic Analyzer Tracer"]
     end
 
@@ -68,7 +80,9 @@ flowchart TD
     ROUTER <--> UART
     ROUTER <--> TIMER
     ROUTER <--> I2C
+    ROUTER <--> ADC
     I2C <--> OLED
+    Core <--> GDB
     ROUTER -.-> VCD
 ```
 
@@ -86,6 +100,8 @@ BoardLens organizes address space into 32-bit aligned regions:
 | `0x40001000` | 1 KB | UART0 | R/W | Serial transmission and reception |
 | `0x40002000` | 1 KB | SysTick Timer | R/W | Periodic tick counter and reload |
 | `0x40003000` | 1 KB | I2C0 Controller | R/W | Bus control, status, and data registers |
+| `0x40004000` | 1 KB | ADC0 Converter | R/W | 12-bit analog input channels (0-3.30V) |
+
 
 ---
 
@@ -144,6 +160,21 @@ boardlens studio --port 8000 --reload
 ```
 
 Then open `http://localhost:8000` in any web browser.
+
+### Run GDB Debug Stub Server
+
+Launch the GDB Remote Serial Protocol (RSP) server for source-level debugging:
+
+```bash
+boardlens gdb-server --port 3333 --bin examples/blinky.bin --core rv32i
+```
+
+Connect using standard GNU Debugger:
+
+```bash
+gdb-multiarch -ex "target remote 127.0.0.1:3333"
+```
+
 
 ---
 
