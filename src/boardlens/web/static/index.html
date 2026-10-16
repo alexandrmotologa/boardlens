@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BoardLens Studio | Embedded Systems Microcontroller Simulator</title>
+  <link rel="stylesheet" href="/static/css/studio.css">
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <h1>BoardLens</h1>
+      <span class="badge badge-core">RV32I Core</span>
+      <span id="statusBadge" class="badge badge-status">READY</span>
+    </div>
+
+    <div class="controls">
+      <span id="cycleCounter" style="font-family: monospace; font-size: 0.85rem; color: #94a3b8; margin-right: 8px;">0 cycles</span>
+      <span id="pcDisplay" style="font-family: monospace; font-size: 0.85rem; color: #38bdf8; margin-right: 16px;">0x00000000</span>
+
+      <select id="exampleSelect" onchange="loadExample()">
+        <option value="blinky">Example: Blinky LED</option>
+        <option value="uart_hello">Example: UART Hello World</option>
+        <option value="fibonacci">Example: Fibonacci in SRAM</option>
+        <option value="oled_demo">Example: OLED Display Test</option>
+      </select>
+
+      <button class="btn-primary" onclick="doRun()">▶ Run</button>
+      <button class="btn-secondary" onclick="doStep()">⏭ Step</button>
+      <button class="btn-secondary" onclick="doPause()">⏸ Pause</button>
+      <button class="btn-danger" onclick="doReset()">↺ Reset</button>
+    </div>
+  </header>
+
+  <div class="studio-grid">
+    <!-- Left Column: Disassembly & Instructions -->
+    <div class="column">
+      <div class="card" style="height: 100%;">
+        <div class="card-header">
+          <h2>Program Disassembly</h2>
+          <span style="font-size: 0.72rem; color: #64748b;">Flash ROM (0x00000000)</span>
+        </div>
+        <div class="card-body">
+          <div id="disassemblyList" class="code-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center Column: SSD1306 OLED & UART Terminal -->
+    <div class="column">
+      <!-- OLED Screen Panel -->
+      <div class="oled-container">
+        <div class="oled-bezel">
+          <canvas id="oledCanvas"></canvas>
+        </div>
+        <div class="oled-meta">
+          <span>SSD1306 128×64 OLED</span>
+          <span>I2C Address: 0x3C</span>
+          <span>Buffer: 1024 Bytes GDDRAM</span>
+        </div>
+      </div>
+
+      <!-- UART Console -->
+      <div class="card" style="flex: 1;">
+        <div class="card-header">
+          <h2>UART0 Serial Console (115200 Baud)</h2>
+          <span style="font-size: 0.72rem; color: #64748b;">0x40001000</span>
+        </div>
+        <div class="terminal-container">
+          <div id="terminalLog" class="terminal-log"></div>
+          <div class="terminal-input-bar">
+            <input id="uartInput" type="text" placeholder="Type serial character or command and press Enter..." onkeydown="if(event.key==='Enter') sendUart()">
+            <button class="btn-primary" style="border-radius: 0; padding: 0 16px;" onclick="sendUart()">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Registers, GPIO, SRAM -->
+    <div class="column">
+      <!-- GPIO Breadboard -->
+      <div class="card" style="flex: 0 0 auto;">
+        <div class="card-header">
+          <h2>GPIO Port A (Pins 0–15)</h2>
+          <span style="font-size: 0.72rem; color: #64748b;">0x40000000</span>
+        </div>
+        <div class="card-body">
+          <div id="gpioPinsContainer" class="gpio-board"></div>
+        </div>
+      </div>
+
+      <!-- Registers View -->
+      <div class="card" style="flex: 1;">
+        <div class="card-header">
+          <h2>RV32I General Purpose Registers</h2>
+          <span style="font-size: 0.72rem; color: #64748b;">32-Bit GPR</span>
+        </div>
+        <div class="card-body">
+          <div id="registersGrid" class="registers-grid"></div>
+        </div>
+      </div>
+
+      <!-- SRAM Hex Viewer -->
+      <div class="card" style="flex: 0 0 200px;">
+        <div class="card-header">
+          <h2>SRAM Data Memory</h2>
+          <span style="font-size: 0.72rem; color: #64748b;">0x20000000</span>
+        </div>
+        <div class="card-body">
+          <table class="hex-table">
+            <tbody id="sramHexTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span>BoardLens v0.1.0 • Cycle-Level Microcontroller Simulation</span>
+    <span>Memory-Mapped I/O: GPIO • UART • SysTick • I2C • SSD1306</span>
+  </footer>
+
+  <script src="/static/js/studio.js"></script>
+</body>
+</html>
