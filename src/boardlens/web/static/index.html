@@ -33,20 +33,34 @@
   </header>
 
   <div class="studio-grid">
-    <!-- Left Column: Disassembly & Instructions -->
+    <!-- Left Column: Disassembly & Code Editor Tabs -->
     <div class="column">
       <div class="card" style="height: 100%;">
-        <div class="card-header">
-          <h2>Program Disassembly</h2>
-          <span style="font-size: 0.72rem; color: #64748b;">Flash ROM (0x00000000)</span>
+        <div class="card-header tab-header">
+          <div class="tab-buttons">
+            <button id="tabBtnDisasm" class="tab-btn active" onclick="switchLeftTab('disasm')">Disassembly</button>
+            <button id="tabBtnEditor" class="tab-btn" onclick="switchLeftTab('editor')">Code Editor</button>
+          </div>
+          <span id="tabMeta" style="font-size: 0.72rem; color: #64748b;">Flash ROM (0x00000000)</span>
         </div>
-        <div class="card-body">
-          <div id="disassemblyList" class="code-list"></div>
+        <div class="card-body" style="padding: 0; display: flex; flex-direction: column; overflow: hidden;">
+          <!-- Disassembly Panel -->
+          <div id="disassemblyPanel" style="flex: 1; overflow-y: auto; padding: 8px;">
+            <div id="disassemblyList" class="code-list"></div>
+          </div>
+          <!-- Code Editor Panel -->
+          <div id="editorPanel" style="display: none; flex: 1; flex-direction: column; overflow: hidden;">
+            <div class="editor-toolbar">
+              <button class="btn-primary" style="padding: 4px 12px; font-size: 0.75rem;" onclick="flashEditor()">⚡ Assemble & Flash</button>
+              <span id="editorStatus" class="editor-status-text">Ready to Assemble</span>
+            </div>
+            <textarea id="assemblyEditor" class="assembly-textarea" spellcheck="false" placeholder="Write RV32I assembly code here..."></textarea>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Center Column: SSD1306 OLED & UART Terminal -->
+    <!-- Center Column: SSD1306 OLED, UART Terminal & Logic Analyzer Waveforms -->
     <div class="column">
       <!-- OLED Screen Panel -->
       <div class="oled-container">
@@ -61,7 +75,7 @@
       </div>
 
       <!-- UART Console -->
-      <div class="card" style="flex: 1;">
+      <div class="card" style="flex: 1; min-height: 140px;">
         <div class="card-header">
           <h2>UART0 Serial Console (115200 Baud)</h2>
           <span style="font-size: 0.72rem; color: #64748b;">0x40001000</span>
@@ -74,9 +88,23 @@
           </div>
         </div>
       </div>
+
+      <!-- Digital Logic Analyzer Waveform Viewer -->
+      <div class="card waveform-card">
+        <div class="card-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <h2>Digital Logic Analyzer</h2>
+            <span class="badge" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4; font-size: 0.65rem;">64 Cycles</span>
+          </div>
+          <span style="font-size: 0.72rem; color: #64748b;">Signals: CLK • PC • ADDR • WE • PA5 • TX • ADC</span>
+        </div>
+        <div class="card-body" style="padding: 6px; overflow: hidden; background: #030712;">
+          <canvas id="waveformCanvas"></canvas>
+        </div>
+      </div>
     </div>
 
-    <!-- Right Column: Registers, GPIO, SRAM -->
+    <!-- Right Column: GPIO, 12-Bit ADC, Registers, SRAM -->
     <div class="column">
       <!-- GPIO Breadboard -->
       <div class="card" style="flex: 0 0 auto;">
@@ -89,8 +117,48 @@
         </div>
       </div>
 
+      <!-- ADC0 12-Bit Analog Sliders -->
+      <div class="card" style="flex: 0 0 auto;">
+        <div class="card-header">
+          <h2>ADC0 12-Bit Analog Channels</h2>
+          <span style="font-size: 0.72rem; color: #64748b;">0x40004000 (0–3.30V)</span>
+        </div>
+        <div class="card-body" style="padding: 8px 12px;">
+          <div class="adc-container">
+            <div class="adc-row">
+              <div class="adc-label-col">
+                <span class="adc-name">CH0</span>
+                <span id="adcVal0" class="adc-val">0.00 V (0)</span>
+              </div>
+              <input id="adcSlider0" type="range" class="adc-slider" min="0" max="3300" value="0" oninput="onAdcChange(0, this.value)">
+            </div>
+            <div class="adc-row">
+              <div class="adc-label-col">
+                <span class="adc-name">CH1</span>
+                <span id="adcVal1" class="adc-val">0.00 V (0)</span>
+              </div>
+              <input id="adcSlider1" type="range" class="adc-slider" min="0" max="3300" value="0" oninput="onAdcChange(1, this.value)">
+            </div>
+            <div class="adc-row">
+              <div class="adc-label-col">
+                <span class="adc-name">CH2</span>
+                <span id="adcVal2" class="adc-val">0.00 V (0)</span>
+              </div>
+              <input id="adcSlider2" type="range" class="adc-slider" min="0" max="3300" value="0" oninput="onAdcChange(2, this.value)">
+            </div>
+            <div class="adc-row">
+              <div class="adc-label-col">
+                <span class="adc-name">CH3</span>
+                <span id="adcVal3" class="adc-val">0.00 V (0)</span>
+              </div>
+              <input id="adcSlider3" type="range" class="adc-slider" min="0" max="3300" value="0" oninput="onAdcChange(3, this.value)">
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Registers View -->
-      <div class="card" style="flex: 1;">
+      <div class="card" style="flex: 1; min-height: 180px;">
         <div class="card-header">
           <h2>RV32I General Purpose Registers</h2>
           <span style="font-size: 0.72rem; color: #64748b;">32-Bit GPR</span>
@@ -101,7 +169,7 @@
       </div>
 
       <!-- SRAM Hex Viewer -->
-      <div class="card" style="flex: 0 0 200px;">
+      <div class="card" style="flex: 0 0 150px;">
         <div class="card-header">
           <h2>SRAM Data Memory</h2>
           <span style="font-size: 0.72rem; color: #64748b;">0x20000000</span>
@@ -116,8 +184,8 @@
   </div>
 
   <footer>
-    <span>BoardLens v0.1.0 • Cycle-Level Microcontroller Simulation</span>
-    <span>Memory-Mapped I/O: GPIO • UART • SysTick • I2C • SSD1306</span>
+    <span>BoardLens v0.1.0 • Cycle-Level Microcontroller & Hardware Logic Simulation</span>
+    <span>Memory-Mapped I/O: GPIO • UART • SysTick • I2C • SSD1306 • ADC0</span>
   </footer>
 
   <script src="/static/js/studio.js"></script>

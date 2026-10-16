@@ -95,3 +95,45 @@ def test_web_api_peripherals_interaction():
     pixels = oled_res.json()
     assert len(pixels) == 64
     assert len(pixels[0]) == 128
+
+
+def test_web_api_adc_channel():
+    res = client.post("/api/adc/channel", json={"channel": 1, "millivolts": 1650})
+    assert res.status_code == 200
+    data = res.json()
+    assert data["channel"] == 1
+    assert data["millivolts"] == 1650
+    assert data["voltage"] == 1.65
+    assert data["status"]["adc"]["channels"][1]["millivolts"] == 1650
+
+
+def test_web_api_editor_flash():
+    # Valid source
+    code = "addi x1, x0, 123\nloop:\nj loop\n"
+    res = client.post("/api/editor/flash", json={"source": code})
+    assert res.status_code == 200
+    data = res.json()
+    assert data["status"] == "ok"
+    assert data["bytes_flashed"] >= 8
+    assert "loop" in data["symbols"]
+
+    # Invalid source
+    bad_res = client.post("/api/editor/flash", json={"source": "invalid_op x1, 2"})
+    assert bad_res.status_code == 400
+
+
+def test_web_api_waveform():
+    client.post("/api/step")
+    res = client.get("/api/waveform")
+    assert res.status_code == 200
+    samples = res.json()["samples"]
+    assert len(samples) > 0
+    sample = samples[-1]
+    assert "cycle" in sample
+    assert "pc" in sample
+    assert "addr" in sample
+    assert "we" in sample
+    assert "pa5" in sample
+    assert "tx" in sample
+    assert "adc" in sample
+

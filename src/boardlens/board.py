@@ -1,6 +1,6 @@
-"""Integrated Virtual Microcontroller Board connecting CPU, Memory, and Peripherals."""
-
+from collections import deque
 from typing import Any, Callable, Dict, List, Optional, Union
+
 from boardlens.cpu.arm.core import ARMCortexMCore
 from boardlens.cpu.base import CPUCore, StepResult, TrapCause
 from boardlens.cpu.rv32i.core import RV32ICore
@@ -70,8 +70,16 @@ class Board:
         if enable_vcd:
             self.enable_vcd_tracing()
 
-        # Telemetry
+        # Telemetry & Logic Analyzer Waveform History
         self.loaded_image: bytes = b""
+        self._waveform_history: deque[Dict[str, Any]] = deque(maxlen=64)
+        self._last_bus_tx: Optional[BusTransaction] = None
+
+        def track_bus(tx: BusTransaction) -> None:
+            self._last_bus_tx = tx
+
+        self.bus.add_listener(track_bus)
+
 
     def enable_vcd_tracing(self, timescale: str = "10ns") -> VCDTracer:
         """Attach VCD waveform tracer to internal bus and peripheral signals."""
@@ -106,12 +114,15 @@ class Board:
     def load_flash(self, data: Union[bytes, bytearray, str]) -> None:
         """Load firmware image. Supports assembly strings, raw binaries, or ELF32 executables."""
         if isinstance(data, str):
-            binary = assemble(data, base_address=self.FLASH_BASE)
+            from boardlens.tooling.assembler import Assembler
+            asm = Assembler(base_address=self.FLASH_BASE)
+            binary = asm.assemble(data)
             self.loaded_image = binary
-            self.symbols = {}
-            self.symbol_names = {}
+            self.symbols = dict(asm.symbols)
+            self.symbol_names = {v: k for k, v in asm.symbols.items()}
             self.flash.load_bytes(0, binary)
             self.reset()
+
         elif bytes(data).startswith(b"\x7fELF"):
             from boardlens.tooling.elf_loader import ELF32
             elf = ELF32(bytes(data))
@@ -141,6 +152,8 @@ class Board:
         self.i2c.reset()
         self.adc.reset()
         self.oled.clear()
+        self._waveform_history.clear()
+        self._last_bus_tx = None
         self.cpu.reset(initial_pc=self.FLASH_BASE)
 
     def add_breakpoint(self, address: int) -> None:
@@ -163,6 +176,19 @@ class Board:
         self.i2c.step(cycles=cycles)
         self.adc.step(cycles=cycles)
 
+        # Record waveform sample for logic analyzer
+        tx = self._last_bus_tx
+        self._waveform_history.append({
+            "cycle": self.cpu.cycles,
+            "pc": f"0x{res.pc:08X}",
+            "pc_val": res.pc,
+            "addr": f"0x{tx.address:08X}" if tx else "0x00000000",
+            "we": 1 if (tx and tx.is_write) else 0,
+            "pa5": 1 if self.gpio.get_pin_output(5) else 0,
+            "tx": 0 if len(self.uart._tx_fifo) > 0 else 1,
+            "adc": self.adc.read_reg(ADCPeripheral.REG_DR),
+        })
+
         if self.vcd:
             t = self.cpu.cycles * 10
             self.vcd.set_time(t)
@@ -184,6 +210,10 @@ class Board:
     @property
     def cycles(self) -> int:
         return self.cpu.cycles
+
+    def get_waveform_history(self) -> List[Dict[str, Any]]:
+        """Return rolling history of clock/bus/peripheral transitions for logic analyzer."""
+        return list(self._waveform_history)
 
     def get_status(self) -> Dict[str, Any]:
         """Aggregate system status for Web Studio dashboard."""
@@ -216,4 +246,18 @@ class Board:
                 "contrast": self.oled.contrast,
                 "inverted": self.oled.inverted,
             },
+            "adc": {
+                "dr": self.adc.read_reg(ADCPeripheral.REG_DR),
+                "sr": f"0x{self.adc.read_reg(ADCPeripheral.REG_SR):02X}",
+                "cr2": f"0x{self.adc.read_reg(ADCPeripheral.REG_CR2):08X}",
+                "channels": [
+                    {
+                        "channel": i,
+                        "millivolts": self.adc.get_channel_millivolts(i),
+                        "voltage": round(self.adc.get_channel_voltage(i), 2),
+                    }
+                    for i in range(4)
+                ],
+            },
         }
+

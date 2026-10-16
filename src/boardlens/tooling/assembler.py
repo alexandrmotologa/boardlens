@@ -19,6 +19,12 @@ class Assembler:
         self.labels: Dict[str, int] = {}
         self.constants: Dict[str, int] = {}
 
+    @property
+    def symbols(self) -> Dict[str, int]:
+        """Dictionary of resolved label symbols to memory addresses."""
+        return self.labels
+
+
     def _parse_reg(self, token: str) -> int:
         clean = token.strip().rstrip(",")
         try:

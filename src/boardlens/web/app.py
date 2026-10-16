@@ -53,6 +53,16 @@ class RunRequest(BaseModel):
     cycles: int = Field(default=1000, ge=1, le=1000000)
 
 
+class AdcChannelRequest(BaseModel):
+    channel: int = Field(..., ge=0, le=3)
+    millivolts: int = Field(..., ge=0, le=3300)
+
+
+class EditorFlashRequest(BaseModel):
+    source: str
+
+
+
 @app.get("/", response_class=HTMLResponse)
 async def get_index():
     index_path = STATIC_DIR / "index.html"
@@ -200,6 +210,40 @@ async def get_oled_pixels() -> List[List[int]]:
     return board.oled.to_pixel_matrix()
 
 
+@app.post("/api/adc/channel")
+async def set_adc_channel(req: AdcChannelRequest) -> Dict[str, Any]:
+    """Set input analog millivolts for ADC channel (0-3)."""
+    board.adc.set_channel_millivolts(req.channel, req.millivolts)
+    return {
+        "channel": req.channel,
+        "millivolts": req.millivolts,
+        "voltage": board.adc.get_channel_voltage(req.channel),
+        "status": board.get_status(),
+    }
+
+
+@app.post("/api/editor/flash")
+async def flash_editor_source(req: EditorFlashRequest) -> Dict[str, Any]:
+    """Hot-assemble RV32I source code directly from editor and flash to virtual board."""
+    try:
+        board.load_flash(req.source)
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+    return {
+        "status": "ok",
+        "bytes_flashed": len(board.loaded_image),
+        "symbols": getattr(board, "symbols", {}),
+        "board_status": board.get_status(),
+    }
+
+
+@app.get("/api/waveform")
+async def get_waveform() -> Dict[str, Any]:
+    """Retrieve rolling history of digital transitions for logic analyzer."""
+    return {"samples": board.get_waveform_history()}
+
+
 @app.websocket("/ws")
 async def websocket_telemetry(ws: WebSocket):
     """Bidirectional WebSocket connection for live studio telemetry."""
@@ -220,6 +264,13 @@ async def websocket_telemetry(ws: WebSocket):
                     board.gpio.set_pin_input(data.get("pin", 0), data.get("high", False))
                 elif cmd == "uart":
                     board.uart.write_to_rx(data.get("data", ""))
+                elif cmd == "adc":
+                    board.adc.set_channel_millivolts(
+                        data.get("channel", 0), data.get("millivolts", 0)
+                    )
+                elif cmd == "flash":
+                    if "source" in data:
+                        board.load_flash(data["source"])
             except asyncio.TimeoutError:
                 pass
 
@@ -228,12 +279,14 @@ async def websocket_telemetry(ws: WebSocket):
                 "status": board.get_status(),
                 "uart_tx": board.uart.read_tx_string(),
                 "oled_pixels": board.oled.to_pixel_matrix(),
+                "waveform": board.get_waveform_history(),
             }
             await ws.send_json(payload)
             await asyncio.sleep(0.05)
 
     except WebSocketDisconnect:
         pass
+
 
 
 # Mount static assets

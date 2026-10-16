@@ -408,3 +408,133 @@ footer {
   color: var(--text-muted);
   flex-shrink: 0;
 }
+
+/* Tabs */
+.tab-header {
+  padding: 6px 12px;
+}
+
+.tab-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.tab-btn {
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+}
+
+.tab-btn:hover {
+  color: var(--text-main);
+  background: var(--bg-card);
+}
+
+.tab-btn.active {
+  background: var(--bg-card);
+  color: var(--accent-cyan);
+  border: 1px solid var(--border-color);
+}
+
+/* Code Editor */
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: var(--bg-card-sub);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.editor-status-text {
+  font-size: 0.72rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  color: #10b981;
+}
+
+.assembly-textarea {
+  flex: 1;
+  width: 100%;
+  background: #030712;
+  color: #38bdf8;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  padding: 10px;
+  border: none;
+  outline: none;
+  resize: none;
+}
+
+/* ADC Sliders */
+.adc-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.adc-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.adc-label-col {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.adc-name {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent-amber);
+}
+
+.adc-val {
+  font-size: 0.72rem;
+  font-family: ui-monospace, monospace;
+  color: #94a3b8;
+}
+
+.adc-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border-color);
+  outline: none;
+}
+
+.adc-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.adc-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* Waveform Canvas */
+.waveform-card {
+  flex: 0 0 210px;
+  min-height: 210px;
+}
+
+#waveformCanvas {
+  width: 100%;
+  height: 160px;
+  display: block;
+}
+
